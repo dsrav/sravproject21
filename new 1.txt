@@ -1,0 +1,955 @@
+
+Wallposts.html-
+<form id="postForm" enctype="multipart/form-data">
+    <textarea id="postText" placeholder="Write your post"></textarea>
+    <input type="file" id="postImage" accept="image/*">
+    <button type="submit">Post</button>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $('#postForm').submit(function(event) {
+        event.preventDefault();
+
+        var postText = $('#postText').val();
+        var postImage = $('#postImage')[0].files[0];
+        var formData = new FormData();
+        formData.append('text', postText);
+        formData.append('image', postImage);
+
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            formData.append('latitude', latitude);
+            formData.append('longitude', longitude);
+
+            $.ajax({
+                type: 'POST',
+                url: 'createPost.php',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    console.log('Post created successfully');
+                    // Do something with the response if needed
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error creating post:', error);
+                }
+            });
+        }, function(error) {
+            console.log('Error getting location:', error);
+        });
+    });
+</script>
+
+<style>
+#postForm {
+  margin-bottom: 20px;
+}
+
+#postText {
+  width: 100%;
+  height: 80px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+#postImage {
+  margin-top: 10px;
+}
+
+button[type="submit"] {
+  display: block;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+</style>
+
+
+Text.html-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insider</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <h1>Insider</h1>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Profile</a></li>
+        <li><a href="#">Friends</a></li>
+        <li><a href="#">Messages</a></li>
+        <li><a href="#">Settings</a></li>
+        <li><a href="#">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+  
+  <main>
+    <section id="login">
+      <h2>Login</h2>
+      <form>
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+      </form>
+    </section>
+    
+    <section id="registration">
+      <h2>Registration</h2>
+      <form>
+        <input type="text" placeholder="Full Name" required>
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Password" required>
+        <input type="password" placeholder="Confirm Password" required>
+        <button type="submit">Register</button>
+      </form>
+    </section>
+    
+    <section id="wall-posts">
+      <h2>Create a Post</h2>
+      <form>
+        <textarea placeholder="Write your post"></textarea>
+        <input type="file" accept="image/*" multiple>
+        <input type="text" placeholder="Location" id="location-input">
+        <button type="button" onclick="addLocation()">Add Location</button>
+        <div id="map"></div>
+        <button type="submit">Post</button>
+      </form>
+    </section>
+    
+    <section class="posts">
+      <article>
+        <header>
+          <h3>User Name</h3>
+          <span>Posted on: 21st May 2023</span>
+        </header>
+        <p>This is a sample post text.</p>
+        <img src="image.jpg" alt="Post Image">
+        <footer>
+          <button class="like-btn">Like</button>
+          <button class="comment-btn">Comment</button>
+        </footer>
+      </article>
+      
+      <!-- More post articles -->
+    </section>
+    
+    <section id="messages">
+      <h2>Messages</h2>
+      <div class="message-container">
+        <div class="message">
+          <div class="sender">Sender Name</div>
+          <div class="content">This is a message content.</div>
+        </div>
+        <!-- More messages -->
+      </div>
+      <form>
+        <textarea placeholder="Write your message"></textarea>
+        <button type="submit">Send</button>
+      </form>
+    </section>
+    
+    <section id="friend-management">
+      <h2>Friend Management</h2>
+      <ul class="friends-list">
+        <li>
+          <div class="friend">Friend Name</div>
+          <button class="block-btn">Block</button>
+          <button class="report-btn">Report</button>
+        </li>
+        <!-- More friends -->
+      </ul>
+    </section>
+    
+    <section id="admin-panel">
+      <h2>Admin Panel</h2>
+      <button class="delete-user-btn">Delete User</button>
+      <button class="view-report-btn">View Reports</button>
+    </section>
+  </main>
+  
+  <footer>
+    <p>&copy; 2023 MySocialMedia. All rights reserved.</p>
+  </footer>
+  
+  <script src="script.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places" async defer></script>
+</body>
+</html>
+
+Styles.css-
+/* Basic styling */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #333;
+  color: #fff;
+  padding: 20px;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+nav ul li {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  padding: 5px;
+}
+
+main {
+  padding: 20px;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+textarea, input[type="text"], input[type="email"], input[type="password"] {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
+button {
+  padding: 10px 20px;
+  background: #333;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.posts {
+  margin-top: 20px;
+}
+
+article {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+article header {
+  margin-bottom: 5px;
+}
+
+footer {
+  margin-top: 10px;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.message {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.friends-list {
+  list-style: none;
+  padding: 0;
+}
+
+.friends-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.block-btn, .report-btn {
+  margin-left: 10px;
+}
+
+.admin-panel {
+  margin-top: 20px;
+}
+
+.delete-user-btn, .view-report-btn {
+  margin-right: 10px;
+}
+.section {
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.notification-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.notification-list li {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.customer-service-contact {
+  display: flex;
+  align-items: center;
+}
+
+.customer-service-contact li {
+  margin-right: 20px;
+}
+
+.contact-details a {
+  font-weight: bold;
+}
+
+Profile.html-
+<html>
+    <link href="insider.css" type="text/css" rel="stylesheet"/>
+    <script src="like.js" ></script>
+    <!-- Profile Section -->
+    <section class="profile">
+        <h1>Profile</h1>
+        <div class="profile-details">
+            <img src="profile-picture.jpg" alt="Profile Picture">
+            <h2>John Doe</h2>
+            <p>Username: johndoe</p>
+            <p>Email: johndoe@example.com</p>
+            <p>Location: City, Country</p>
+        </div>
+        <div class="profile-posts">
+            <h2>Recent Posts</h2>
+            <div class="post">
+                <h3>Post Title</h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+            <div class="post">
+                <h3>Post Title</h3>
+                <a href="wallposts.html">Click here to access posts</a>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+            <!-- Add more posts here -->
+        </div>
+        <div class="post">
+            <p>This is a post.</p>
+            <button class="like-btn">Like</button>
+            <button class="unlike-btn">Unlike</button>
+          </div>
+</html>
+
+
+
+
+
+<!-- Notification Section -->
+<html>
+<section class="notifications">
+    <h1>Notifications</h1>
+    <ul class="notification-list">
+        <li>New friend request from John</li>
+        <li>Your post has been liked by Jane</li>
+        <li>You have a new message from Sarah</li>
+    </ul>
+</section>
+</html>
+
+
+
+
+
+
+<?php 
+	if($_POST['phpfunction'] == 'createUser') {
+		createUser();
+	}	else if($_POST['phpfucntion'] == 'retrieveUser') {
+		retrieveUser();
+	}
+	
+	function creatUser() {
+		$firstname = $_POST['firstName'];
+		$lastname = $_POST['lastname'];
+		$pass = $_POST['password'];
+		
+		echo "Thank you ". $firstname . " " . $lastname . " for registering.";
+		echo "An email was sent to " . $email;
+	}
+	
+	function retreieveUser() {
+		echo "retrieveUser funtion was called";
+	}
+?>
+
+
+<?php
+    include "database_Script.php";
+
+    echo "hah"; // Added a semicolon at the end of the line.
+
+    $username = $_POST['email'];
+    $password = $_POST['password'];
+
+    $sql = "SELECT `password`, `role` FROM `user_table` WHERE `username` = '".$username."'"; // Replaced single quotes with backticks and used the correct variable $username.
+    $result = mysqli_query($connection, $sql); // Replaced mysql_query with mysqli_query and added a semicolon at the end of the line.
+
+    $rows = mysqli_fetch_assoc($result);
+
+    $debug = $rows['password'];
+
+    if(password_verify($password, $rows['password'])){
+        $sql2 = "SELECT `username`, `password` FROM `user_table` WHERE `username` = '".$username."'"; // Added the missing variable $username and backticks.
+        $result2 = mysqli_query($connection, $sql2); // Replaced mysql_query with mysqli_query and added a semicolon at the end of the line.
+        $rows2 = mysqli_fetch_assoc($result2);
+
+        session_start();
+        $_SESSION['username'] = $rows2['username'];
+    } else{
+        echo '{"result":"false"}'; // Fixed the syntax for echoing JSON response.
+    }
+
+    if($result) {
+        echo "Logged in";
+        echo "<script>alert('Logged in');</script>"; // Corrected the syntax for displaying an alert.
+    } else {
+        echo mysqli_error($connection);
+        return;
+    }
+    mysqli_close($connection); // Fixed the variable name to '$connection'.
+
+$email = htmlspecialchars($_REQUEST['email']); 
+$email = mysqli_real_escape_string($con, $email);// slashes in front to prevent SQL injection
+$password =  htmlspecialchars($_REQUEST['password']);
+$password = mysqli_real_escape_string($con, md5($password));
+
+
+?>
+
+
+console.log("Test to see if this message appears on the console");
+
+// Submit event handler for the form with id "formLoginUser"
+$('#formLoginUser').submit(function(event){
+    // Serialize the form data
+    var formData = $('#formLoginUser').serialize();
+    // Prevent the default form submission behavior
+    event.preventDefault();
+    // Log a message to the console
+    console.log("Insider log test");
+    
+    // Send an AJAX request
+    $.ajax({
+        type: "POST",                   // HTTP method for the request
+        url: "loginUser.php",           // URL to which the request is sent
+        data: formData,                 // Data to be sent in the request
+        contentType: false,             // Content type of the request
+        processData: false,             // Process data or not
+        success: function(msg){         // Success callback function
+            console.log("Hello");       // Log a message to the console
+        },
+        error: function(msg){           // Error callback function
+            console.log("Hello2");      // Log a message to the console
+            console.log(msg);           // Log the error message to the console
+        }
+    });
+});
+
+// Get all like and unlike buttons
+const likeBtns = document.querySelectorAll('.like-btn');
+const unlikeBtns = document.querySelectorAll('.unlike-btn');
+
+// Attach event listeners to like buttons
+likeBtns.forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    // Find the parent post element
+    const post = this.parentNode;
+
+    // Hide the like button
+    this.style.display = 'none';
+
+    // Show the unlike button
+    post.querySelector('.unlike-btn').style.display = 'inline-block';
+  });
+});
+
+// Attach event listeners to unlike buttons
+unlikeBtns.forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    // Find the parent post element
+    const post = this.parentNode;
+
+    // Hide the unlike button
+    this.style.display = 'none';
+
+    // Show the like button
+    post.querySelector('.like-btn').style.display = 'inline-block';
+  });
+});
+
+
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width-device-width, intial-scale=1.0">
+	<title> INSIDER </title>
+	<link href="insider.css" type="text/css" rel="stylesheet"/>
+	<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+	<script src="loginUser.js"></script>
+	
+
+	<!--include 'insider.php'-->
+</head>
+
+<body>
+	<!-- Header Section -->
+	<header class="header">
+		<!-- Navigation Bar -->
+		<nav class="navbar">
+				<a href="text.html">Home</a>
+				<a href="profile.html">Profile</a>
+				<a href="notification.html">Notifications</a>
+				<a href="customerservice.html">Customer Service</a>
+		</nav>
+		<!-- Website Title -->
+		<h1>THE INSIDER</h1>
+		<div class="cube">
+  <div class="face front">INSIDER</div>
+  <div class="face back">SOCIAL </div>
+  <div class="face right">MEDIA</div>
+  <div class="face left">SAFE</div>
+  <div class="face top">SECURE</div>
+  <div class="face bottom">EASY TO USE</div>
+</div>
+	</header>
+	<!--<script src="insider.js"></script>-->
+
+	<!-- Main Content Section -->
+	<h2>WELCOME TO THE INSIDER</h2>
+	<p> A social media platform to connect with new and old friends</p>
+	
+	<!-- Login Form -->
+	<form id="formLoginUser" method="POST">
+		Email: <br>
+		<input type="email" name="email" id="email" required> <br>
+		
+		Password: <br>
+		<input type="password" name="password" id="password" required> <br><br>
+
+		<input type="submit" value="Submit">
+	</form>	
+
+	<!-- Link to create a new account -->
+	Create a new account <a href="newaccount.html">Click here</a>
+
+	<!-- Contact Information -->
+	<h2> <a href= "mailto:info@example.org">Contact</a></h2>
+
+	<?php session_start(); ?>
+
+	<?php
+	try{
+		$userName = $_SESSION['username'];
+		// Check if user is logged in
+		if(is_null($userName)){
+			echo "You must be logged in to view this page";
+		}
+	}
+	catch (Exception $e){
+	}
+
+	if($userName != null):
+	?>
+		<!-- Message for logged-in users -->
+		<h1> A place for safe connections with friends and family </h1>
+
+	<?php endif;
+		?>
+	
+</body>
+</html>
+
+/* insider.css */
+.cube {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: rotate 5s infinite linear;
+}
+
+@keyframes rotate {
+  0%   { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+  100% { transform: rotateX(1turn) rotateY(1turn) rotateZ(1turn); }
+}
+
+.cube .face {
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid #000;
+  text-align: center;
+  line-height: 200px;
+  font-size: 24px;
+}
+
+.cube .front  { transform: translateZ(100px); }
+.cube .back   { transform: translateZ(-100px) rotateY(180deg); }
+.cube .right  { transform: translateX(100px) rotateY(90deg); }
+.cube .left   { transform: translateX(-100px) rotateY(-90deg); }
+.cube .top    { transform: translateY(-100px) rotateX(90deg); }
+.cube .bottom { transform: translateY(100px) rotateX(-90deg); }
+
+
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: #f2f2f2;
+  }
+  
+  .container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 20px;
+  }
+  
+  /* Header */
+  
+  .header {
+	background-color: #333;
+	color: #fff;
+	text-align: center;
+	padding: 20px;
+  }
+  
+  .navbar {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 20px;
+  }
+  
+  .navbar a {
+	color: #fff;
+	text-decoration: none;
+	margin: 0 10px;
+	padding: 10px;
+	transition: color 0.3s;
+  }
+  
+  .navbar a:hover {
+	color: #ffc107;
+  }
+  
+  h1 {
+	font-size: 36px;
+	margin-bottom: 20px;
+  }
+  
+  /* Form */
+  
+  form {
+	width: 300px;
+	margin: 0 auto;
+	background-color: #fff;
+	padding: 20px;
+	border-radius: 5px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  form input[type="email"],
+  form input[type="password"] {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+  }
+  
+  form input[type="submit"] {
+	width: 100%;
+	padding: 10px;
+	background-color: #333;
+	color: #fff;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+  }
+  
+  form input[type="submit"]:hover {
+	background-color: #ffc107;
+  }
+  
+  a {
+	color: yellow;
+	text-decoration: none;
+  }
+  
+  a:hover {
+	color: #ffc107;
+  }
+/* Profile Section */
+.profile {
+    margin: 20px;
+}
+
+.profile h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.profile-details img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.profile-details h2 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.profile-details p {
+    margin-bottom: 5px;
+}
+
+.profile-posts h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.profile-posts .post {
+    margin-bottom: 10px;
+}
+
+.profile-posts .post h3 {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.profile-posts .post p {
+    margin-bottom: 5px;
+}
+/* for like and unlike*/
+.post {
+  margin-bottom: 10px;
+}
+
+.like-btn, .unlike-btn {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.unlike-btn {
+  display: none;
+}
+
+//Password Validate
+//The following lines of code checks whether
+//or not user entered the same password in both
+//paasword and confirm password textbox
+var password = document.getElementById("txtPassword");
+var confirmPassword = document.getElementById("txtConfirmPassword");
+
+
+function validatePassword(){
+  if(password.value != confirmPassword.value) {
+    confirmPassword.setCustomValidity("Passwords Don't Match");
+  } else {
+    confirmPassword.setCustomValidity('');
+  }
+}
+
+password.onchange = validatePassword;
+confirmPassword.onkeyup = validatePassword;
+
+
+//Event handler for registration form submit 
+$('#formUserRegistration').submit(function(event){
+	formData = $('#formUserRegistration').serialize();
+    // cancels the form submission
+    event.preventDefault();
+
+	$.ajax({
+		type: "POST",
+		url: "RegistrationDAO.php",
+		data: formData+"&phpfunction=createUser",
+	    success: function(echoedMsg){ 
+			if(echoedMsg=='true')    {
+				window.location="../LoginPage/Login.html";
+			} else {
+				$("#divMessage").html(echoedMsg);
+			}
+	    },
+		error: function(msg){ 
+			console.log(msg);
+	    }
+	});
+});
+
+
+<?php
+// Handle form submissions and database interactions here
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MySocialMedia</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- HTML code from previous example goes here -->
+  
+  <script src="script.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places" async defer></script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>Social Media</h1>
+    <nav>
+      <ul>
+        <li><a href="home.html">Home</a></li>
+        <li><a href="#">Profile</a></li>
+        <li><a href="#">Messages</a></li>
+        <li><a href="#">Notifications</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <section>
+      <h2>Welcome to the Home Page</h2>
+      <p>This is the content of the Home page.</p>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2023Insider. All rights reserved.</p>
+  </footer>
+</body>
+</html>
+
+
+<?php
+    $servername = "localhost";
+    $username = "srav@123";
+    $password = "Insider@123";
+    $dbname = "s4215674";
+
+    $connection = new mysqli($servername, $username, $password, $dbname);
+
+    if($connection -> connect_error){
+        echo $connection -> connect_error;
+    }
+?>	
+
+
+
+<html> 
+<!-- Customer Service Section -->
+<section class="customer-service">
+    <h1>Customer Service</h1>
+    <p>If you have any questions or need assistance, please contact our customer support team:</p>
+    <ul class="contact-details">
+        <li>Email: support@example.com</li>
+        <li>Phone: 123-456-7890</li>
+        <li>Live Chat: <a href="#">Start Chat</a></li>
+    </ul>
+</section>
+</html>
+
+<?php
+    include "database_Script.php";
+
+    $username = $_POST['email'];
+    $password = $_POST['password'];
+
+    $sql = "INSERT INTO 'user_table'(user_email, user_pass)"."values"."('$email', '$password')";
+
+    if(mysql_query($connection, $sql)) {
+        echo "Added user";
+    } else {
+        echo mysqli_error($connection);
+        return;
+    }
+    mysqli_close($conection);
+?>
+
+
+<?php
+// Get the post data
+$postText = $_POST['text'];
+$postImage = $_FILES['image'];
+$latitude = $_POST['latitude'];
+$longitude = $_POST['longitude'];
+
+// File details
+$fileName = $postImage['name'];
+$fileTmpName = $postImage['tmp_name'];
+$fileSize = $postImage['size'];
+$fileError = $postImage['error'];
+$fileType = $postImage['type'];
+
+// Move the uploaded file to a desired location
+$targetDir = 'uploads/';
+$targetFile = $targetDir . basename($fileName);
+move_uploaded_file($fileTmpName, $targetFile);
+
+// Process the post data, e.g., store it in a database, save the image path, etc.
+
+// Send a response back to the client
+$response = array('status' => 'success', 'message' => 'Post created successfully');
+echo json_encode($response);
+?>
